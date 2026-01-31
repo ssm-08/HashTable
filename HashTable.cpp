@@ -7,20 +7,22 @@
 
 using namespace std;
 
-void add(Node** table, Node* node);
+void add(Node**& table, int& size, Node* node);
 void random(Node** table, int n);
 void print(Node** table);
 void del();
 void quit();
 
 Student createStudent();
-void rehash(Node**& table);
-int makeHash(Node* node, int size);
+bool checkId();
+
+void rehash(Node**& table, int& size);
+int makeHash(int id, int size);
 
 int main() {
-  //Hashtable
 
-  Node** hashtable[101];
+  int size = 101;
+  Node** hashtable = new Node*[size]{};
   
   bool run = true;
 
@@ -45,14 +47,105 @@ int main() {
     int id = 0;
     float gpa = 0;
 
-    Student* student = new Student(first, last, id, gpa);
-    Node* node = new Node(student);
-    
     if (strcmp(input, ADD) == 0) { // Add
+
+      cout << "Enter first name: ";
+      cin >> first;
+
+      cout << "Enter last name: ";
+      cin >> last;
+
+      cout << "Enter id: ";
+      cin >> id;
+
+      cout << "Enter gpa: ";
+      cin >> gpa;
+      
+      Student* student = new Student(first, last, id, gpa);
+      Node* node = new Node(student);
+
+    } else if (strcmp(input, RAND) == 0) { // Generate Students
     } else if (strcmp(input, PRINT) == 0) { // Print Students
     } else if (strcmp(input, DEL) == 0) { // Delete Student
     } else if (strcmp(input, QUIT) == 0) { // Quit Program
       run = false;
     }
   }  
+}
+
+int makeHash(int id, int size) {
+  return id % size;
+}
+
+void rehash(Node**&table, int& size) {
+
+  // Resize and create new table
+  int newSize = size + 101;
+  Node** newTable = new Node*[newSize]{};
+
+  // Temp variables
+  Node* current = NULL;
+  int id;
+  int key;
+
+  // Iterate through old hash table
+  for (int i = 0; i < size; i++) {
+    // Store current space
+    current = table[i];
+
+    // Go through linked list
+    while (current != NULL) {
+
+      //Store next node
+      Node* next = current->getNext();
+      
+      id = current->getStudent()->getId();
+      key = makeHash(id, newSize);
+
+      Node* head = newTable[key];
+
+      //Add current node to linked list in new table
+
+      if (head == NULL) {
+       	newTable[key] = current;
+      } else {
+	while (head->getNext() != NULL) {
+	  head = head->getNext();
+	}
+
+	head->setNext(current);
+      }
+
+      // Delink
+      current->setNext(NULL);
+      
+      // Set next node
+      current = next;
+      
+    }
+  }
+
+  delete[] table;
+  
+  size = newSize;
+  table = newTable;
+}
+
+void add(Node**& table, int& size, Node* node) {
+
+  int id = node->getStudent()->getId();
+  int key = makeHash(id, size);
+
+  Node* head = table[key];
+
+  if (head == NULL) {
+    table[key] = node;
+  } else if (head->getNext() == NULL) {
+    head->setNext(node);
+  } else if (head->getNext()->getNext() == NULL) {
+    head->getNext()->setNext(node);
+  } else {
+    rehash(table, size);
+    add(table, size, node);
+  }
 }
