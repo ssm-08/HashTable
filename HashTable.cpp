@@ -9,12 +9,12 @@ using namespace std;
 
 void add(Node**& table, int& size, Node* node);
 void random(Node** table, int n);
-void print(Node** table);
+void print(Node** table, int size);
 void del();
 void quit();
 
 Student createStudent();
-bool checkId();
+bool checkId(Node** table, int size, int id);
 
 void rehash(Node**& table, int& size);
 int makeHash(int id, int size);
@@ -60,12 +60,16 @@ int main() {
 
       cout << "Enter gpa: ";
       cin >> gpa;
-      
-      Student* student = new Student(first, last, id, gpa);
-      Node* node = new Node(student);
 
+      if (checkId(hashtable, size, id) == true) {
+	cout << "Id in use." << endl;
+      } else {
+	Student* student = new Student(first, last, id, gpa);
+	Node* node = new Node(student);
+      }
     } else if (strcmp(input, RAND) == 0) { // Generate Students
     } else if (strcmp(input, PRINT) == 0) { // Print Students
+      print(hashtable, size);
     } else if (strcmp(input, DEL) == 0) { // Delete Student
     } else if (strcmp(input, QUIT) == 0) { // Quit Program
       run = false;
@@ -125,10 +129,28 @@ void rehash(Node**&table, int& size) {
     }
   }
 
+  // Switch tables
+  
   delete[] table;
   
   size = newSize;
   table = newTable;
+}
+
+bool checkId(Node** table, int size, int id) {
+  
+  int key = makeHash(id, size);
+  Node* current = table[key];
+
+  while (current != NULL) {
+    if (current->getStudent()->getId() == id) {
+      return true;
+    }
+
+    current = current->getNext();
+  }
+  
+  return false;
 }
 
 void add(Node**& table, int& size, Node* node) {
@@ -147,5 +169,21 @@ void add(Node**& table, int& size, Node* node) {
   } else {
     rehash(table, size);
     add(table, size, node);
+  }
+}
+
+void print(Node** table, int size) {
+
+  Node* current = NULL;
+  
+  for (int i = 0; i < size; i++) {
+    current = table[i];
+
+    while (current != NULL) {
+
+      current->getStudent()->getDisplay();
+      current = current->getNext();
+
+    }
   }
 }
