@@ -10,7 +10,7 @@ using namespace std;
 void add(Node**& table, int& size, Node* node);
 void random(Node** table, int n);
 void print(Node** table, int size);
-void del();
+void del(Node** table, Node* current, Node* prev, int key, int id);
 void quit();
 
 Student createStudent();
@@ -71,6 +71,16 @@ int main() {
     } else if (strcmp(input, PRINT) == 0) { // Print Students
       print(hashtable, size);
     } else if (strcmp(input, DEL) == 0) { // Delete Student
+
+      cout << "Enter id: ";
+      cin >> id;
+
+      int key = makeHash(id, size);
+      Node* current = hashtable[key];
+      Node* prev = NULL;
+
+      del(hashtable, current, prev, key, id);
+      
     } else if (strcmp(input, QUIT) == 0) { // Quit Program
       run = false;
     }
@@ -183,6 +193,28 @@ void print(Node** table, int size) {
 
       current->getStudent()->getDisplay();
       current = current->getNext();
+
+    }
+  }
+}
+
+void del(Node** table, Node* current, Node* prev, int key, int id) {
+  
+  if (current != NULL) {
+    Node* next = current->getNext();
+    
+    if (current->getStudent()->getId() == id) {
+      if (prev != NULL) {
+	prev->setNext(current->getNext());
+      } else {
+	table[key] = current->getNext();
+      }
+      
+      delete current;
+      
+    } else {
+
+      del(table, next, current, key, id);
 
     }
   }
