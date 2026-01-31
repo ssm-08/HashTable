@@ -11,7 +11,7 @@ void add(Node**& table, int& size, Node* node);
 void random(Node** table, int n);
 void print(Node** table, int size);
 void del(Node** table, Node* current, Node* prev, int key, int id);
-void quit();
+void quit(Node**& table, int size);
 
 Student createStudent();
 bool checkId(Node** table, int size, int id);
@@ -82,6 +82,8 @@ int main() {
       del(hashtable, current, prev, key, id);
       
     } else if (strcmp(input, QUIT) == 0) { // Quit Program
+      quit(hashtable, size);
+      delete[] hashtable;
       run = false;
     }
   }  
@@ -218,4 +220,23 @@ void del(Node** table, Node* current, Node* prev, int key, int id) {
 
     }
   }
+}
+
+void quit(Node**& table, int size) {
+
+  Node* current = NULL;
+  
+  for (int i = 0; i < size; i++) {
+    current = table[i];
+
+    while (current != NULL) {
+      Node* next = current->getNext();
+
+      delete current;
+      current = next;
+    }
+
+    table[i] = NULL;
+  }
+  
 }
