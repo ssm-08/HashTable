@@ -13,7 +13,7 @@ void print(Node** table, int size);
 void del(Node** table, Node* current, Node* prev, int key, int id);
 void quit(Node**& table, int size);
 
-Student createStudent();
+Student createStudent(Node**& table, int& size, int& id, int n);
 bool checkId(Node** table, int size, int id);
 
 void rehash(Node**& table, int& size);
@@ -26,6 +26,8 @@ int main() {
   
   bool run = true;
 
+  int randomId = 1;
+  
   char input[99] = "";
   
   const char* ADD = "ADD";
@@ -66,6 +68,7 @@ int main() {
       } else {
 	Student* student = new Student(first, last, id, gpa);
 	Node* node = new Node(student);
+	add(hashtable, size, node);
       }
     } else if (strcmp(input, RAND) == 0) { // Generate Students
     } else if (strcmp(input, PRINT) == 0) { // Print Students
@@ -96,7 +99,7 @@ int makeHash(int id, int size) {
 void rehash(Node**&table, int& size) {
 
   // Resize and create new table
-  int newSize = size + 101;
+  int newSize = size + 100;
   Node** newTable = new Node*[newSize]{};
 
   // Temp variables
@@ -155,6 +158,7 @@ bool checkId(Node** table, int size, int id) {
   Node* current = table[key];
 
   while (current != NULL) {
+
     if (current->getStudent()->getId() == id) {
       return true;
     }
@@ -172,6 +176,8 @@ void add(Node**& table, int& size, Node* node) {
 
   Node* head = table[key];
 
+  node->getStudent()->getDisplay();
+  
   if (head == NULL) {
     table[key] = node;
   } else if (head->getNext() == NULL) {
