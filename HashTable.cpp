@@ -13,7 +13,7 @@ void print(Node** table, int size);
 void del(Node** table, Node* current, Node* prev, int key, int id);
 void quit(Node**& table, int size);
 
-Student createStudent(Node**& table, int& size, int& id, int n);
+Student createStudent(Node**& table, int& size, int id);
 bool checkId(Node** table, int size, int id);
 
 void rehash(Node**& table, int& size);
@@ -49,6 +49,8 @@ int main() {
     int id = 0;
     float gpa = 0;
 
+    int n = 0;
+    
     if (strcmp(input, ADD) == 0) { // Add
 
       cout << "Enter first name: ";
@@ -71,6 +73,19 @@ int main() {
 	add(hashtable, size, node);
       }
     } else if (strcmp(input, RAND) == 0) { // Generate Students
+
+      cout << "Enter number of students: ";
+      cin >> n;
+
+      for (int i = 0; i < n; i++) {
+	while (checkId(hashtable, size, randomId) == true) {
+	  randomId++;
+	}
+
+	// generate student;
+	// add student;
+      }
+
     } else if (strcmp(input, PRINT) == 0) { // Print Students
       print(hashtable, size);
     } else if (strcmp(input, DEL) == 0) { // Delete Student
