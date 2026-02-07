@@ -1,19 +1,21 @@
 #include <iostream>
 #include <cstring>
 #include <fstream>
+#include <cstdlib>
+#include <ctime>
 
 #include "Node.h"
 #include "Student.h"
 
 using namespace std;
 
+// Initialize functions
 void add(Node**& table, int& size, Node* node);
-void random(Node** table, int n);
 void print(Node** table, int size);
 void del(Node** table, Node* current, Node* prev, int key, int id);
 void quit(Node**& table, int size);
 
-Student createStudent(Node**& table, int& size, int id);
+Student* createStudent(int id);
 bool checkId(Node** table, int size, int id);
 
 void rehash(Node**& table, int& size);
@@ -21,6 +23,9 @@ int makeHash(int id, int size);
 
 int main() {
 
+  // Declare program variables
+  srand(time(NULL));
+  
   int size = 101;
   Node** hashtable = new Node*[size]{};
   
@@ -65,6 +70,7 @@ int main() {
       cout << "Enter gpa: ";
       cin >> gpa;
 
+      // Add if id is unique
       if (checkId(hashtable, size, id) == true) {
 	cout << "Id in use." << endl;
       } else {
@@ -72,6 +78,7 @@ int main() {
 	Node* node = new Node(student);
 	add(hashtable, size, node);
       }
+      
     } else if (strcmp(input, RAND) == 0) { // Generate Students
 
       cout << "Enter number of students: ";
@@ -82,8 +89,9 @@ int main() {
 	  randomId++;
 	}
 
-	// generate student;
-	// add student;
+	Student* student = createStudent(randomId);
+	Node* node = new Node(student);
+	add(hashtable, size, node);
       }
 
     } else if (strcmp(input, PRINT) == 0) { // Print Students
@@ -107,10 +115,79 @@ int main() {
   }  
 }
 
+// Create a random student using text files
+Student* createStudent(int id) {
+
+  int firstSize = 0;
+  int lastSize = 0;
+
+  fstream firstNames("firstNames.txt");
+  fstream lastNames("lastNames.txt");
+
+  firstNames.seekg(0, firstNames.end);
+  firstSize = firstNames.tellg();
+  firstSize++;
+  firstNames.seekg(0, firstNames.beg);
+
+  lastNames.seekg(0, lastNames.end);
+  lastSize = lastNames.tellg();
+  lastSize++;
+  lastNames.seekg(0, lastNames.beg);
+
+  char first[firstSize];
+  char last[lastSize];
+
+  firstNames.getline(first, firstSize);
+  lastNames.getline(last, lastSize);
+
+  int f = rand() % 51;
+  int l = rand() % 51;
+  
+  char firstName[99];
+  char lastName[99];
+
+  char* name;
+  
+  name = strtok(first, ",");
+  int i = 0;
+  
+  while (name != NULL) {
+    if (i == f) {
+      strcpy(firstName, name);
+      break;
+    }
+    
+    i++;
+    name = strtok(NULL, ",");
+  }
+
+  name = strtok(last, ",");
+  int j = 0;
+  
+  while (name != NULL) {
+    if (j == l) {
+      strcpy(lastName, name);
+      break;
+    }
+
+    j++;
+    name = strtok(NULL, ",");
+  }
+
+  float gpa = rand() % 5;
+
+  Student* student = new Student(firstName, lastName, id, gpa);
+
+  return student;
+  
+}
+
+// Hash function
 int makeHash(int id, int size) {
   return id % size;
 }
 
+// Rehash a new table with 100 more slots
 void rehash(Node**&table, int& size) {
 
   // Resize and create new table
@@ -167,6 +244,7 @@ void rehash(Node**&table, int& size) {
   table = newTable;
 }
 
+// Iterate through the table and check existing ids
 bool checkId(Node** table, int size, int id) {
   
   int key = makeHash(id, size);
@@ -184,6 +262,7 @@ bool checkId(Node** table, int size, int id) {
   return false;
 }
 
+// Add the node to the table and chain no more than thrice
 void add(Node**& table, int& size, Node* node) {
 
   int id = node->getStudent()->getId();
@@ -205,6 +284,7 @@ void add(Node**& table, int& size, Node* node) {
   }
 }
 
+// Iterate through the hashtable and print out students
 void print(Node** table, int size) {
 
   Node* current = NULL;
@@ -221,6 +301,7 @@ void print(Node** table, int size) {
   }
 }
 
+// Delete one node using recursive and adjust linked list
 void del(Node** table, Node* current, Node* prev, int key, int id) {
   
   if (current != NULL) {
@@ -243,6 +324,7 @@ void del(Node** table, Node* current, Node* prev, int key, int id) {
   }
 }
 
+// Clear all occupied slots in hashtable and delete nodes
 void quit(Node**& table, int size) {
 
   Node* current = NULL;
